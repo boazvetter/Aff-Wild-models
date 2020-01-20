@@ -1,10 +1,13 @@
 from __future__ import division
 from __future__ import absolute_import
 from __future__ import print_function
+import os
 
 import tensorflow as tf
-import data_process
 import numpy as np
+
+import data_process
+
 
 slim = tf.contrib.slim
 
@@ -13,18 +16,18 @@ FLAGS = tf.app.flags.FLAGS
 
 tf.app.flags.DEFINE_integer('batch_size', 1, '''The batch size to use.''')
 
-tf.app.flags.DEFINE_integer('seq_length', 80,
+tf.app.flags.DEFINE_integer('seq_length', 2,
                             'the sequence length: how many consecutive frames to use for the RNN; if the network is only CNN then put here any number you want : total_batch_size = batch_size * seq_length')
 
 tf.app.flags.DEFINE_integer('size', 96, 'dimensions of input images, e.g. 96x96')
 
-tf.app.flags.DEFINE_string('network', 'vggface_4096',
+tf.app.flags.DEFINE_string('network', 'vggface_2000',
                            ' which network architecture we want to use,  pick between : vggface_4096, vggface_2000, affwildnet_vggface, affwildnet_resnet ')
 
-tf.app.flags.DEFINE_string('input_file', '/homes/input.csv',
+tf.app.flags.DEFINE_string('input_file', '~/Documents/Thesis/Datasets/Temp/images.csv',
                            'the input file : it should be in the format: image_file_location,valence_value,arousal_value  and images should be jpgs')
 
-tf.app.flags.DEFINE_string('pretrained_model_checkpoint_path', '/homes/model.ckpt-0',
+tf.app.flags.DEFINE_string('pretrained_model_checkpoint_path', '/home/boaz/Documents/Thesis/Code/Aff-Wild-models/weights/vggface/model.ckpt-0',
                            '''the pretrained model checkpoint path to restore,if there exists one  '''
                            '''''')
 
@@ -39,7 +42,8 @@ def evaluate():
     g = tf.Graph()
     with g.as_default():
 
-        image_list, label_list = data_process.read_labeled_image_list(FLAGS.input_file)
+        input_file = os.path.join(os.path.expanduser('~'), 'Documents', 'Thesis', 'Datasets', 'Temp', 'images.csv')
+        image_list, label_list = data_process.read_labeled_image_list(input_file)
         # split into sequences, note: in the cnn models case this is splitting into batches of length: seq_length ;
         # for the cnn-rnn models case, I do not check whether the images in a sequence are consecutive or the images are from the same video/the images are displaying the same person
         image_list, label_list = data_process.make_rnn_input_per_seq_length_size(image_list, label_list,
@@ -53,7 +57,9 @@ def evaluate():
                                                     capacity=1000, shared_name=None, name=None)
         images_batch, labels_batch, image_locations_batch = data_process.decodeRGB(input_queue, FLAGS.seq_length,
                                                                                    FLAGS.size)
+
         images_batch = tf.to_float(images_batch)
+        print(images_batch)
         images_batch -= 128.0
         images_batch /= 128.0  # scale all pixel values in range: [-1,1]
 

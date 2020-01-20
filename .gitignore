@@ -2,3 +2,7 @@ graphs/
 weights/
 .idea/
 .ipynb_checkpoints/
+__pycache__/
+vggface/__pycache__/
+
+

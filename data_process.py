@@ -38,7 +38,8 @@ def decodeRGB(input_queue, seq_length, size=96):
 
     for i in range(seq_length):
         file_content = tf.read_file(input_queue[0][i])
-        image = tf.image.decode_jpeg(file_content, channels=3)
+        image = tf.image.decode_png(file_content, channels=3)
+        # image = tf.image.decode_jpeg(file_content, channels=3)
         image = tf.image.resize_images(image, tf.convert_to_tensor([size, size]))
         images.append(image)
 
@@ -54,6 +55,7 @@ def make_rnn_input_per_seq_length_size(images, labels, seq_length):
         Returns:
         Two tensors: the images file locations with shape ( int(N/80),80 ) and corresponding labels with shape ( int(N/80),80,2 )
 	"""
+
     ims = []
     labs = []
     for l in range(int(len(images) / seq_length)):
