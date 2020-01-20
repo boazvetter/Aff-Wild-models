@@ -21,13 +21,13 @@ tf.app.flags.DEFINE_integer('seq_length', 2,
 
 tf.app.flags.DEFINE_integer('size', 96, 'dimensions of input images, e.g. 96x96')
 
-tf.app.flags.DEFINE_string('network', 'vggface_2000',
+tf.app.flags.DEFINE_string('network', 'vggface_4096',
                            ' which network architecture we want to use,  pick between : vggface_4096, vggface_2000, affwildnet_vggface, affwildnet_resnet ')
 
-tf.app.flags.DEFINE_string('input_file', '~/Documents/Thesis/Datasets/Temp/images.csv',
+tf.app.flags.DEFINE_string('input_file', '/home/boaz/Documents/Thesis/Datasets/Temp/images.csv',
                            'the input file : it should be in the format: image_file_location,valence_value,arousal_value  and images should be jpgs')
 
-tf.app.flags.DEFINE_string('pretrained_model_checkpoint_path', '/home/boaz/Documents/Thesis/Code/Aff-Wild-models/weights/vggface/model.ckpt-0',
+tf.app.flags.DEFINE_string('pretrained_model_checkpoint_path', '/home/boaz/Documents/Thesis/Code/Aff-Wild-models/models/vggface-4096/model.ckpt-975',
                            '''the pretrained model checkpoint path to restore,if there exists one  '''
                            '''''')
 
@@ -42,8 +42,7 @@ def evaluate():
     g = tf.Graph()
     with g.as_default():
 
-        input_file = os.path.join(os.path.expanduser('~'), 'Documents', 'Thesis', 'Datasets', 'Temp', 'images.csv')
-        image_list, label_list = data_process.read_labeled_image_list(input_file)
+        image_list, label_list = data_process.read_labeled_image_list(FLAGS.input_file)
         # split into sequences, note: in the cnn models case this is splitting into batches of length: seq_length ;
         # for the cnn-rnn models case, I do not check whether the images in a sequence are consecutive or the images are from the same video/the images are displaying the same person
         image_list, label_list = data_process.make_rnn_input_per_seq_length_size(image_list, label_list,
@@ -59,7 +58,6 @@ def evaluate():
                                                                                    FLAGS.size)
 
         images_batch = tf.to_float(images_batch)
-        print(images_batch)
         images_batch -= 128.0
         images_batch /= 128.0  # scale all pixel values in range: [-1,1]
 
@@ -149,6 +147,10 @@ def evaluate():
             conc_arousal = concordance_cc2(predictions[:, 1], labels[:, 1])
             conc_valence = concordance_cc2(predictions[:, 0], labels[:, 0])
 
+
+            for i in range(len(predictions)):
+                print("Labels: ", labels[i], "Predictions: ", predictions[i], "Error: ", (abs(labels[i]-predictions[i])))
+            print("------------------------------------------------------------------------------")
             print('Concordance on valence : {}'.format(conc_valence))
             print('Concordance on arousal : {}'.format(conc_arousal))
             print('Concordance on total : {}'.format((conc_arousal + conc_valence) / 2))
