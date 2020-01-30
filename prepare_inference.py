@@ -7,14 +7,10 @@ the neural network. Configured to use with cropped pngs of MTCNN.
 Author: Boaz Vetter, 2020
 """
 import os
-import warnings
 
 import cv2
-
-with warnings.catch_warnings():
-    warnings.filterwarnings("ignore", category=FutureWarning)
-    import tensorflow as tf
-    import numpy as np
+import tensorflow as tf
+import numpy as np
 
 def convert_to_square(M, val):
     """Converts the given matrix into a square matrix.

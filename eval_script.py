@@ -1,7 +1,6 @@
 from __future__ import division
 from __future__ import absolute_import
 from __future__ import print_function
-import os
 
 import tensorflow as tf
 import numpy as np
@@ -30,12 +29,6 @@ tf.app.flags.DEFINE_string('input_file', '/home/boaz/Documents/Thesis/Datasets/T
 tf.app.flags.DEFINE_string('pretrained_model_checkpoint_path', '/home/boaz/Documents/Thesis/Code/Aff-Wild-models/models/vggface-4096/model.ckpt-975',
                            '''the pretrained model checkpoint path to restore,if there exists one  '''
                            '''''')
-
-
-###############################################################################################################################################################
-####  The sample code and the model weights are for RESEARCH PURPOSES only and cannot be used for commercial use.      ########################################
-####                                 Do not redistribute this elsewhere                                                ########################################
-################################################################################################################################################################
 
 
 def evaluate():
